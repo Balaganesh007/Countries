@@ -10,12 +10,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
+enum class CountryApiStatus {LOADING , ERROR , DONE}
 class DisplayViewModel : ViewModel() {
     private var viewModelJob = Job()
     private val coroutineScope = CoroutineScope(viewModelJob + Dispatchers.Main )
 
-    private var _status = MutableLiveData<String>()
-    val status: LiveData<String>
+    private var _status = MutableLiveData<CountryApiStatus>()
+    val status: LiveData<CountryApiStatus>
         get() = _status
 
     private var _properties = MutableLiveData<List<CountriesProperty>>()
@@ -29,13 +30,16 @@ class DisplayViewModel : ViewModel() {
     private fun getCountriesProperties() {
         coroutineScope.launch {
 
-            var getPropertiesDeferred = ObjectCountriesApi.retrofitService.getPropertiesAsync()
+            val getPropertiesDeferred = ObjectCountriesApi.retrofitService.getPropertiesAsync()
             try {
-                var listResult = getPropertiesDeferred.await()
-                _status.value = "Success: ${listResult.size} Mars properties retrieved"
+                _status.value = CountryApiStatus.LOADING
+                val listResult = getPropertiesDeferred.await()
+
+                _status.value = CountryApiStatus.DONE
                 if(listResult.size > 0) _properties.value = listResult
             } catch (e: Exception) {
-                _status.value = "Failure: ${e.message}"
+                _status.value = CountryApiStatus.ERROR
+                _properties.value = ArrayList()
             }
         }
     }
