@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import com.example.countriesapp.PhotoViewAdapter
 import com.example.countriesapp.R
 import com.example.countriesapp.databinding.DisplayFragmentBinding
@@ -33,7 +34,17 @@ class DisplayFragment : Fragment() {
         binding.displayViewModel = viewModel
         binding.lifecycleOwner = this
 
-        binding.photosGrid.adapter = PhotoViewAdapter()
+        //binding.photosGrid.adapter = PhotoViewAdapter()
+        binding.photosGrid.adapter = PhotoViewAdapter(PhotoViewAdapter.OnClickListener {
+            viewModel.displayPropertyDetails(it)
+        })
+
+        viewModel.navigateToSelectedProperty.observe(viewLifecycleOwner, Observer {
+            if ( null != it ) {
+                this.findNavController().navigate(DisplayFragmentDirections.actionDisplayFragmentToDetailedView(it))
+                viewModel.displayPropertyDetailsComplete()
+            }
+        })
 
         return binding.root
     }

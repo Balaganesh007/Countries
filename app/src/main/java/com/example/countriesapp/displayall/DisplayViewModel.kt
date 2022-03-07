@@ -12,6 +12,7 @@ import kotlinx.coroutines.launch
 
 enum class CountryApiStatus {LOADING , ERROR , DONE}
 class DisplayViewModel : ViewModel() {
+
     private var viewModelJob = Job()
     private val coroutineScope = CoroutineScope(viewModelJob + Dispatchers.Main )
 
@@ -22,6 +23,10 @@ class DisplayViewModel : ViewModel() {
     private var _properties = MutableLiveData<List<CountriesProperty>>()
     val properties: LiveData<List<CountriesProperty>>
         get() = _properties
+
+    private val _navigateToSelectedProperty = MutableLiveData<CountriesProperty?>()
+    val navigateToSelectedProperty: MutableLiveData<CountriesProperty?>
+        get() = _navigateToSelectedProperty
 
     init {
         getCountriesProperties()
@@ -36,12 +41,18 @@ class DisplayViewModel : ViewModel() {
                 val listResult = getPropertiesDeferred.await()
 
                 _status.value = CountryApiStatus.DONE
-                if(listResult.size > 0) _properties.value = listResult
+                if(listResult.isNotEmpty()) _properties.value = listResult
             } catch (e: Exception) {
                 _status.value = CountryApiStatus.ERROR
                 _properties.value = ArrayList()
             }
         }
+    }
+    fun displayPropertyDetails(countriesProperty: CountriesProperty) {
+        _navigateToSelectedProperty.value = countriesProperty
+    }
+    fun displayPropertyDetailsComplete() {
+        _navigateToSelectedProperty.value = null
     }
     override fun onCleared() {
         super.onCleared()

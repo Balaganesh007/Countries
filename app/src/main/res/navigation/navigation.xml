@@ -9,5 +9,21 @@
     <fragment
         android:id="@+id/displayFragment"
         android:name="com.example.countriesapp.displayall.DisplayFragment"
-        android:label="DisplayFragment" />
+        android:label="DisplayFragment" >
+        <action
+            android:id="@+id/action_displayFragment_to_detailedView"
+            app:destination="@id/detailedView" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/detailedView"
+        android:name="com.example.countriesapp.detailedView.DetailedViewFragment"
+        android:label="DetailedView">
+        <argument
+            android:name="selectedProperty"
+            app:argType="com.example.countriesapp.network.CountriesProperty"
+            />
+    </fragment>
+
+
 </navigation>
